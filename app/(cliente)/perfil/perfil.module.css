@@ -1,0 +1,29 @@
+.container { max-width: 600px; padding-bottom: 80px; }
+@media (min-width: 768px) { .container { padding-bottom: 0; } }
+.title { font-size: var(--font-2xl); font-weight: 800; color: var(--color-text); margin-bottom: var(--space-6); }
+.profileCard {
+  display: flex; align-items: center; gap: var(--space-5);
+  background: var(--gradient-hero); color: white;
+  border-radius: var(--radius-xl); padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+.avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); display: flex;
+  align-items: center; justify-content: center;
+  font-size: var(--font-2xl); font-weight: 800; color: white;
+  flex-shrink: 0; border: 3px solid rgba(255,255,255,0.4);
+}
+.name { font-size: var(--font-xl); font-weight: 700; }
+.email { font-size: var(--font-sm); opacity: 0.8; }
+.section { background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: var(--space-6); margin-bottom: var(--space-4); }
+.sectionTitle { font-size: var(--font-md); font-weight: 700; color: var(--color-text); margin-bottom: var(--space-4); }
+.grid { display: grid; gap: var(--space-4); }
+@media (min-width: 480px) { .grid { grid-template-columns: 1fr 1fr; } }
+.field { display: flex; flex-direction: column; gap: var(--space-1); }
+.fieldLabel { font-size: var(--font-xs); font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.fieldValue { font-size: var(--font-md); color: var(--color-text); font-weight: 500; }
+.packCard { display: flex; align-items: center; gap: var(--space-4); background: var(--gradient-soft); border-radius: var(--radius-lg); padding: var(--space-4); }
+.packIcon { font-size: 2rem; }
+.packName { font-size: var(--font-lg); font-weight: 700; color: var(--color-text); }
+.packDetail { font-size: var(--font-sm); color: var(--color-text-muted); }

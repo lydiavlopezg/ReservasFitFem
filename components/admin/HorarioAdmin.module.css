@@ -1,0 +1,18 @@
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); }
+.title { font-size: var(--font-2xl); font-weight: 800; color: var(--color-text); }
+.grid { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+.dayCol { background: white; border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; }
+.dayHeader { padding: var(--space-3); background: var(--color-bg-alt); font-weight: 700; font-size: var(--font-sm); text-align: center; border-bottom: 1px solid var(--color-border); }
+.dayBody { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); min-height: 100px; }
+.empty { text-align: center; color: var(--color-text-light); font-size: var(--font-xs); font-style: italic; margin: auto 0; }
+.classCard { display: flex; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; position: relative; background: white; transition: box-shadow var(--transition-fast); }
+.classCard:hover { box-shadow: var(--shadow-sm); }
+.classColor { width: 4px; background: var(--color-primary); flex-shrink: 0; }
+.classContent { padding: var(--space-2) var(--space-3); flex: 1; }
+.className { font-weight: 700; font-size: var(--font-sm); color: var(--color-text); }
+.classTime { font-size: var(--font-xs); color: var(--color-text-muted); font-weight: 600; }
+.classMeta { font-size: var(--font-xs); color: var(--color-text-light); margin-top: 2px; }
+.delBtn { position: absolute; top: var(--space-1); right: var(--space-1); background: none; border: none; font-size: 1.2rem; color: var(--color-text-light); cursor: pointer; border-radius: var(--radius-sm); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.delBtn:hover { background: #FEE2E2; color: var(--color-error); }

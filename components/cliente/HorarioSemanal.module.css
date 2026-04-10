@@ -1,0 +1,250 @@
+.container {
+  padding-bottom: 80px; /* espacio para bottom nav en móvil */
+}
+
+@media (min-width: 768px) {
+  .container { padding-bottom: var(--space-8); }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.packBadge {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.weekNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.weekLabel {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Grid de días */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.dayCol {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.dayCol.today {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 2px rgba(255,0,128,0.15);
+}
+
+.dayHeader {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dayName {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  color: var(--color-text);
+}
+
+.dayDate {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+.todayDot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: pulse-glow 2s ease infinite;
+}
+
+.clases {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.noClases {
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: var(--font-xs);
+  padding: var(--space-4);
+}
+
+/* Tarjeta de clase */
+.classCard {
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  transition: all var(--transition-fast);
+  background: white;
+}
+
+.classCard.clickable {
+  cursor: pointer;
+}
+.classCard.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--card-color, var(--color-primary));
+}
+
+.cardAccent {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--color-border);
+}
+
+.cardBody {
+  padding: var(--space-2) var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.cardName {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardTime {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+.cardPlazas {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.cardBadge {
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+/* Estados */
+.stateDisponible .cardAccent { background: var(--card-color, var(--color-primary)); }
+.stateDisponible .cardName { color: var(--color-text); }
+
+.stateReservada {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+}
+.stateReservada .cardAccent { background: #22C55E; }
+.stateReservada .cardName { color: #15803D; }
+.stateReservada .cardBadge { color: #15803D; }
+
+.stateEspera {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+}
+.stateEspera .cardAccent { background: #F59E0B; }
+.stateEspera .cardName { color: #92400E; }
+
+.stateCompleta {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+  opacity: 0.85;
+}
+.stateCompleta .cardAccent { background: #EF4444; }
+.stateCompleta .cardName { color: #991B1B; }
+
+.stateDisabled {
+  background: #F8F5F9;
+  border-color: #E5D8EA;
+  opacity: 0.6;
+}
+.stateDisabled .cardName { color: var(--color-text-muted); }
+
+.stateLocked {
+  background: #F9F9F9;
+  border-color: #E5E7EB;
+  opacity: 0.5;
+}
+.stateLocked .cardName { color: #9CA3AF; }
+
+/* Leyenda */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  align-items: center;
+}
+
+.leyenda span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
