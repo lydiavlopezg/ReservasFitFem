@@ -33,7 +33,7 @@ export default function ClientNav({ profile }: { profile: Profile | null }) {
       <div className={styles.inner}>
         {/* Logo */}
         <Link href="/horario" className={styles.logo}>
-          <img src="/logolargo.png" alt="Fit&Fem" style={{ height: '32px', width: 'auto' }} />
+          <img src="/logolargo.PNG" alt="Fit&Fem" style={{ height: '32px', width: 'auto' }} />
         </Link>
 
         {/* Nav links — escritorio */}

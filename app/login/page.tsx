@@ -57,7 +57,7 @@ export default function LoginPage() {
       <div className={styles.card}>
         {/* Logo */}
         <div className={styles.logoWrap}>
-          <img src="/logolargo.png" alt="Fit&Fem Studio" style={{ maxWidth: '200px', height: 'auto', marginBottom: '1rem' }} />
+          <img src="/logolargo.PNG" alt="Fit&Fem Studio" style={{ maxWidth: '200px', height: 'auto', marginBottom: '1rem' }} />
           <p className={styles.logoStudio}>STUDIO · OCAÑA</p>
         </div>
 
