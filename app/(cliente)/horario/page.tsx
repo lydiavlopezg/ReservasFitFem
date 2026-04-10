@@ -22,15 +22,16 @@ export default async function HorarioPage() {
     .select('modalidad_id')
     .eq('user_id', user.id)
 
-  // Obtener sesiones de las 2 semanas (actual y próxima)
+  // Obtener solo sesiones de la semana actual
   const hoy = new Date()
   const lunes = new Date(hoy)
-  lunes.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7))
-  const viernesProx = new Date(lunes)
-  viernesProx.setDate(lunes.getDate() + 11)
+  lunes.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7)) // Lunes de esta semana
+  
+  const domingo = new Date(lunes)
+  domingo.setDate(lunes.getDate() + 6) // Domingo de esta semana
 
   const desde = lunes.toISOString().split('T')[0]
-  const hasta = viernesProx.toISOString().split('T')[0]
+  const hasta = domingo.toISOString().split('T')[0]
 
   const { data: sesiones } = await supabase
     .from('sesiones')

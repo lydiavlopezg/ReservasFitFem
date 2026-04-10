@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Logo from '@/components/common/Logo'
 import styles from './AdminNav.module.css'
 
 export default function AdminNav({ nombre }: { nombre: string }) {
@@ -27,7 +28,7 @@ export default function AdminNav({ nombre }: { nombre: string }) {
     <>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <img src="/logolargo.PNG" alt="Fit&Fem" style={{ height: '40px', width: 'auto', marginBottom: '8px' }} />
+          <Logo height="40px" style={{ marginBottom: '8px' }} />
           <div className={styles.adminBadge}>ADMIN PANEL</div>
         </div>
 
@@ -55,7 +56,7 @@ export default function AdminNav({ nombre }: { nombre: string }) {
       {/* Header móvil */}
       <header className={styles.mobileHeader}>
         <div className={styles.brand}>
-          <img src="/logolargo.PNG" alt="Fit&Fem" style={{ height: '28px', width: 'auto' }} />
+          <Logo height="28px" />
         </div>
         <button className={styles.menuBtn} onClick={() => document.getElementById('mobileNav')?.classList.toggle(styles.open)}>
           ☰

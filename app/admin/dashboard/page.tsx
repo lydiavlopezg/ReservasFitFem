@@ -7,44 +7,68 @@ export const dynamic = 'force-dynamic'
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  // Datos base: total usuarios, clases
-  const { count: usuariosCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('rol', 'cliente')
-  
-  // Ocupación promedio
-  const { data: sesiones } = await supabase.from('sesiones').select('plazas_ocupadas, clases(plazas_max, modalidades(nombre))')
-  let totalPlazas = 0
-  let totalOcupadas = 0
-  
-  const ocupacionPorMod: Record<string, { o: number, t: number }> = {}
+  // 1. Usuarios totales (clientes)
+  const { count: usuariosCount } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .eq('rol', 'cliente')
 
-  sesiones?.forEach(s => {
-    if (!s.clases) return
+  // 2. Sesiones con datos de clase y modalidad (hasta 2000 para cubrir varios meses)
+  const { data: sesiones } = await supabase
+    .from('sesiones')
+    .select(`
+      id, fecha, plazas_ocupadas, cancelada,
+      clases (
+        hora_inicio, plazas_max,
+        modalidades (nombre)
+      )
+    `)
+    .order('fecha', { ascending: false })
+    .limit(2000)
+
+  // 3. Reservas con perfil de usuario (para edad y estado)
+  const { data: reservas } = await supabase
+    .from('reservas')
+    .select(`
+      id, created_at, estado, sesion_id,
+      users (fecha_nacimiento, nombre)
+    `)
+    .order('created_at', { ascending: false })
+    .limit(5000)
+
+  // Mapear datos para el cliente
+  // Nota: Pasamos los datos crudos pero estructurados para que el cliente filtre por Mes/Año
+  const sesionesMapped = (sesiones || []).map(s => {
     const c = Array.isArray(s.clases) ? s.clases[0] : s.clases
-    const max = c.plazas_max
-    const ocup = s.plazas_ocupadas
-    totalPlazas += max
-    totalOcupadas += ocup
-
-    const mod: any = c.modalidades
-    const nombreMod = Array.isArray(mod) ? mod[0]?.nombre : mod?.nombre
-    const finalMod = nombreMod || '?'
-    if (!ocupacionPorMod[finalMod]) ocupacionPorMod[finalMod] = { o: 0, t: 0 }
-    ocupacionPorMod[finalMod].o += ocup
-    ocupacionPorMod[finalMod].t += max
+    const modObj: any = c?.modalidades
+    const nombreMod = Array.isArray(modObj) ? modObj[0]?.nombre : modObj?.nombre
+    
+    return {
+      id: s.id,
+      fecha: s.fecha,
+      ocupadas: s.plazas_ocupadas,
+      max: c?.plazas_max || 22,
+      modalidad: nombreMod || 'Desconocida',
+      hora: c?.hora_inicio || '00:00'
+    }
   })
 
-  const globalOcc = totalPlazas > 0 ? (totalOcupadas / totalPlazas) * 100 : 0
+  const reservasMapped = (reservas || []).map(r => {
+    const u = Array.isArray(r.users) ? r.users[0] : r.users
+    return {
+      id: r.id,
+      fecha: r.created_at,
+      estado: r.estado,
+      sesion_id: r.sesion_id,
+      fecha_nacimiento: u?.fecha_nacimiento || null
+    }
+  })
 
-  const dataAforo = Object.entries(ocupacionPorMod).map(([name, val]) => ({
-    name,
-    ocupacion: parseFloat(((val.o / Math.max(val.t, 1)) * 100).toFixed(1))
-  }))
-
-  const stats = {
-    usuariosTotales: usuariosCount || 0,
-    ocupacionMediaGlobal: parseFloat(globalOcc.toFixed(1)),
-    sesionesTotales: sesiones?.length || 0,
-  }
-
-  return <DashboardClient stats={stats} aforoData={dataAforo.sort((a,b) => b.ocupacion - a.ocupacion)} />
+  return (
+    <DashboardClient 
+      usuariosTotales={usuariosCount || 0}
+      sesiones={sesionesMapped}
+      reservas={reservasMapped}
+    />
+  )
 }

@@ -26,6 +26,7 @@ export async function POST(req: Request) {
       nombre: user_metadata.nombre,
       apellidos: user_metadata.apellidos,
       dni_numerico: user_metadata.dni_numerico,
+      fecha_nacimiento: user_metadata.fecha_nacimiento,
       rol: user_metadata.rol,
       pack_id: user_metadata.pack_id,
       onboarding_done: true

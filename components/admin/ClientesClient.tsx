@@ -29,6 +29,7 @@ export default function ClientesClient({ clientes, packs, modalidades }: { clien
   const [fApellidos, setFApellidos] = useState('')
   const [fEmail, setFEmail] = useState('')
   const [fDni, setFDni] = useState('')
+  const [fNacimiento, setFNacimiento] = useState('')
   const [fPack, setFPack] = useState('')
   const [fMods, setFMods] = useState<string[]>([])
   
@@ -57,9 +58,10 @@ export default function ClientesClient({ clientes, packs, modalidades }: { clien
         email: fEmail, password: fDni,
         user_metadata: {
           nombre: fNombre, apellidos: fApellidos, dni_numerico: fDni,
-          pack_id: fPack, rol: 'cliente'
+          pack_id: fPack, rol: 'cliente', fecha_nacimiento: fNacimiento
         },
-        modalidades: fMods
+        modalidades: fMods,
+        fecha_nacimiento: fNacimiento
       })
     })
 
@@ -95,6 +97,10 @@ export default function ClientesClient({ clientes, packs, modalidades }: { clien
               <div className="form-group">
                 <label className="label">DNI Numérico (Contraseña)</label>
                 <input required className="input" minLength={8} maxLength={8} pattern="\d{8}" value={fDni} onChange={e=>setFDni(e.target.value)} placeholder="Ej: 12345678" />
+              </div>
+              <div className="form-group">
+                <label className="label">Fecha de Nacimiento</label>
+                <input required type="date" className="input" value={fNacimiento} onChange={e=>setFNacimiento(e.target.value)} />
               </div>
               <div className="form-group">
                 <label className="label">Pack</label>

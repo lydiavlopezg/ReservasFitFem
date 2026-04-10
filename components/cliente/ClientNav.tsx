@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Logo from '@/components/common/Logo'
 import styles from './ClientNav.module.css'
 
 interface Profile {
@@ -31,9 +32,8 @@ export default function ClientNav({ profile }: { profile: Profile | null }) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        {/* Logo */}
         <Link href="/horario" className={styles.logo}>
-          <img src="/logolargo.PNG" alt="Fit&Fem" style={{ height: '32px', width: 'auto' }} />
+          <Logo height="32px" />
         </Link>
 
         {/* Nav links — escritorio */}

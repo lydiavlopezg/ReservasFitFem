@@ -48,18 +48,18 @@ interface Props {
 
 export default function HorarioSemanal({ sesiones, misReservas, userId, profile, userModalidadIds, config }: Props) {
   const router = useRouter()
-  const [semanaOffset, setSemanaOffset] = useState(0)
   const [selectedSesion, setSelectedSesion] = useState<Sesion | null>(null)
+  const [now] = useState(new Date())
 
-  // Calcular lunes de la semana mostrada
+  // Calcular lunes de la semana actual
   const lunes = useMemo(() => {
     const d = new Date()
     const day = d.getDay()
     const diff = (day === 0 ? -6 : 1 - day)
-    d.setDate(d.getDate() + diff + semanaOffset * 7)
+    d.setDate(d.getDate() + diff)
     d.setHours(0, 0, 0, 0)
     return d
-  }, [semanaOffset])
+  }, [])
 
   const fechasSemana = useMemo(() => {
     return Array.from({ length: 5 }, (_, i) => {
@@ -87,7 +87,7 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
     return map
   }, [misReservas])
 
-  // Modalidades ya reservadas HOY por tipo → para regla de no repetición
+  // Modalidades ya reservadas HOY por tipo
   const modalidadesReservadasPorFecha = useMemo(() => {
     const map: Record<string, Set<string>> = {}
     sesiones.forEach(s => {
@@ -103,38 +103,20 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
   }, [sesiones, reservasBySessionId])
 
   // Estado de una sesión para este usuario
-  function getEstado(s: Sesion): 'disponible' | 'reservada' | 'espera' | 'no_pack' | 'no_repeticion' | 'completa' | 'semana_cerrada' {
+  function getEstado(s: Sesion): 'disponible' | 'reservada' | 'espera' | 'no_pack' | 'no_repeticion' | 'completa' | 'semana_cerrada' | 'pasada' {
     if (!s.clases) return 'semana_cerrada'
+
+    // REGLA: ¿La clase ya ha pasado?
+    const fechaClase = new Date(`${s.fecha}T${s.clases.hora_inicio}`)
+    if (fechaClase < now) return 'pasada'
+
     const modId = s.clases.modalidades?.id
 
     // ¿Ya tiene reserva?
     if (reservasBySessionId[s.id] === 'confirmada') return 'reservada'
     if (reservasBySessionId[s.id] === 'espera') return 'espera'
 
-    // Semana cerrada: usar dia_apertura (1-7) y hora_apertura ('HH:MM')
-    const fechaSesion = new Date(s.fecha + 'T00:00:00')
-    const diaSesion = fechaSesion.getDay() // 0=Dom, 1=Lun
-    
-    // Calcular Lunes de esa semana
-    const diffToLunes = diaSesion === 0 ? -6 : 1 - diaSesion
-    const lunesSesion = new Date(fechaSesion)
-    lunesSesion.setDate(lunesSesion.getDate() + diffToLunes)
-    
-    const confDia = parseInt(config['dia_apertura_semana'] || '7', 10)
-    const confHora = config['hora_apertura_semana'] || '18:00'
-    const diffApertura = confDia - 8 // Si 7(Dom), abre 1 día antes del lunes
-    
-    const openingDate = new Date(lunesSesion)
-    openingDate.setDate(lunesSesion.getDate() + diffApertura)
-    const [hh, mm] = confHora.split(':').map(Number)
-    openingDate.setHours(hh, mm, 0, 0)
-    
-    const timeNow = new Date()
-    if (timeNow < openingDate) {
-      return 'semana_cerrada'
-    }
-
-    // ¿Pack permite esta modalidad?
+    // Pack permite esta modalidad?
     const esIlimitado = profile?.packs?.num_actividades === 99
     if (!esIlimitado && !userModalidadIds.includes(modId)) return 'no_pack'
 
@@ -155,26 +137,13 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
 
   return (
     <div className={styles.container}>
-      {/* Header */}
+      {/* Header Simplificado */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Horario de clases</h1>
           <p className={styles.packBadge}>
-            🏋️ {profile?.packs?.nombre || 'Sin pack'}
+            🏋️ Pack: {profile?.packs?.nombre || 'Sin pack'}
           </p>
-        </div>
-        <div className={styles.weekNav}>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => setSemanaOffset(o => o - 1)}
-            disabled={semanaOffset <= 0}
-          >← Anterior</button>
-          <span className={styles.weekLabel}>{semanaLabel}</span>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => setSemanaOffset(o => o + 1)}
-            disabled={semanaOffset >= 1}
-          >Siguiente →</button>
         </div>
       </div>
 
@@ -195,9 +164,6 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
             <div key={fechaStr} className={`${styles.dayCol} ${esHoy ? styles.today : ''}`}>
               <div className={styles.dayHeader}>
                 <span className={styles.dayName}>{DIAS[idx]}</span>
-                <span className={styles.dayDate}>
-                  {fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                </span>
                 {esHoy && <span className={styles.todayDot} />}
               </div>
 
@@ -272,7 +238,7 @@ function ClassCard({
   const horaFin = sesion.clases?.hora_fin?.substring(0, 5) || ''
   const plazasMax = sesion.clases?.plazas_max || 22
 
-  const isDisabled = ['no_pack', 'no_repeticion', 'semana_cerrada', 'completa'].includes(estado)
+  const isDisabled = ['no_pack', 'no_repeticion', 'semana_cerrada', 'completa', 'pasada'].includes(estado)
   const isClickable = ['disponible', 'espera'].includes(estado)
 
   const stateClass: Record<string, string> = {
@@ -283,6 +249,7 @@ function ClassCard({
     no_repeticion: styles.stateDisabled,
     completa: styles.stateCompleta,
     semana_cerrada: styles.stateLocked,
+    pasada: styles.stateDisabled,
   }
 
   const tooltip: Record<string, string> = {
@@ -290,6 +257,7 @@ function ClassCard({
     no_repeticion: 'Ya tienes reservada esta modalidad hoy',
     semana_cerrada: 'Reservas aún no disponibles',
     completa: 'Clase completa',
+    pasada: 'Esta clase ya ha terminado',
   }
 
   return (

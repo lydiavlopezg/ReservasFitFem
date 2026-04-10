@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Logo from '@/components/common/Logo'
 import styles from './login.module.css'
 
 export default function LoginPage() {
@@ -57,7 +58,7 @@ export default function LoginPage() {
       <div className={styles.card}>
         {/* Logo */}
         <div className={styles.logoWrap}>
-          <img src="/logolargo.PNG" alt="Fit&Fem Studio" style={{ maxWidth: '200px', height: 'auto', marginBottom: '1rem' }} />
+          <Logo height="auto" style={{ maxWidth: '200px', marginBottom: '1rem' }} />
           <p className={styles.logoStudio}>STUDIO · OCAÑA</p>
         </div>
 
