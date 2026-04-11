@@ -119,7 +119,7 @@ export default function BookingModal({ sesion, userId, estado, onClose, onSucces
                     <p className={styles.infoValue}>
                       {plazasLibres <= 0 ? (
                         <span style={{ color: '#EF4444' }}>Lista de espera</span>
-                      ) : `${plazasLibres} de ${sesion.clases.plazas_max}`}
+                      ) : `${plazasLibres} plazas libres`}
                     </p>
                   </div>
                 </div>

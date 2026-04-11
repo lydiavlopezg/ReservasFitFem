@@ -27,11 +27,11 @@ export default async function HorarioPage() {
   const lunes = new Date(hoy)
   lunes.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7)) // Lunes de esta semana
   
-  const domingo = new Date(lunes)
-  domingo.setDate(lunes.getDate() + 6) // Domingo de esta semana
+  const domingoNext = new Date(lunes)
+  domingoNext.setDate(lunes.getDate() + 13) // Domingo de la PROXIMA semana
 
   const desde = lunes.toISOString().split('T')[0]
-  const hasta = domingo.toISOString().split('T')[0]
+  const hasta = domingoNext.toISOString().split('T')[0]
 
   const { data: sesiones } = await supabase
     .from('sesiones')

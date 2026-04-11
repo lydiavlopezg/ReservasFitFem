@@ -49,17 +49,43 @@ interface Props {
 export default function HorarioSemanal({ sesiones, misReservas, userId, profile, userModalidadIds, config }: Props) {
   const router = useRouter()
   const [selectedSesion, setSelectedSesion] = useState<Sesion | null>(null)
+  const [weekOffset, setWeekOffset] = useState(0)
   const [now] = useState(new Date())
 
-  // Calcular lunes de la semana actual
-  const lunes = useMemo(() => {
+  // Lunes de la semana ACTUAL (estricto)
+  const lunesActual = useMemo(() => {
     const d = new Date()
     const day = d.getDay()
     const diff = (day === 0 ? -6 : 1 - day)
-    d.setDate(d.getDate() + diff)
-    d.setHours(0, 0, 0, 0)
-    return d
+    const res = new Date(d)
+    res.setDate(d.getDate() + diff)
+    res.setHours(0, 0, 0, 0)
+    return res
   }, [])
+
+  // Lunes de la semana que estamos VIENDO
+  const lunes = useMemo(() => {
+    const d = new Date(lunesActual)
+    d.setDate(lunesActual.getDate() + (weekOffset * 7))
+    return d
+  }, [lunesActual, weekOffset])
+
+  // ¿Está la semana siguiente bloqueada?
+  const isNextWeekLocked = useMemo(() => {
+    if (weekOffset === 0) return false
+    
+    const diaApertura = parseInt(config['dia_apertura_semana'] || '5') // 5 = Viernes
+    const horaApertura = config['hora_apertura_semana'] || '18:00'
+    const [h, m] = horaApertura.split(':').map(Number)
+    
+    // La apertura ocurre en la semana ANTERIOR a la que estamos viendo.
+    // Si vemos weekOffset=1, la apertura fue en weekOffset=0.
+    const openingDate = new Date(lunesActual)
+    openingDate.setDate(lunesActual.getDate() + (diaApertura - 1))
+    openingDate.setHours(h, m, 0, 0)
+    
+    return now < openingDate
+  }, [weekOffset, config, lunesActual, now])
 
   const fechasSemana = useMemo(() => {
     return Array.from({ length: 5 }, (_, i) => {
@@ -106,6 +132,9 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
   function getEstado(s: Sesion): 'disponible' | 'reservada' | 'espera' | 'no_pack' | 'no_repeticion' | 'completa' | 'semana_cerrada' | 'pasada' {
     if (!s.clases) return 'semana_cerrada'
 
+    // REGLA: ¿La semana está cerrada?
+    if (isNextWeekLocked) return 'semana_cerrada'
+
     // REGLA: ¿La clase ya ha pasado?
     const fechaClase = new Date(`${s.fecha}T${s.clases.hora_inicio}`)
     if (fechaClase < now) return 'pasada'
@@ -139,12 +168,34 @@ export default function HorarioSemanal({ sesiones, misReservas, userId, profile,
     <div className={styles.container}>
       {/* Header Simplificado */}
       <div className={styles.header}>
-        <div>
+        <div className={styles.headerInfo}>
           <h1 className={styles.title}>Horario de clases</h1>
           <p className={styles.packBadge}>
             🏋️ Pack: {profile?.packs?.nombre || 'Sin pack'}
           </p>
         </div>
+
+        <div className={styles.weekNav}>
+          <button 
+            className={`${styles.navBtn} ${weekOffset === 0 ? styles.active : ''}`}
+            onClick={() => setWeekOffset(0)}
+          >
+            Esta semana
+          </button>
+          <button 
+            className={`${styles.navBtn} ${weekOffset === 1 ? styles.active : ''}`}
+            onClick={() => setWeekOffset(1)}
+          >
+            Semana próxima
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.currentWeekLabel}>
+        {semanaLabel}
+        {isNextWeekLocked && weekOffset === 1 && (
+          <span className={styles.lockedWarning}> 🔒 Reservas aún no disponibles</span>
+        )}
       </div>
 
       {/* Grid de días */}
@@ -279,7 +330,7 @@ function ClassCard({
             {estado === 'completa' || plazasLibres <= 0 ? (
               <span style={{ color: '#EF4444', fontWeight: 700 }}>COMPLETA</span>
             ) : (
-              `${plazasLibres}/${plazasMax} plazas`
+              `${plazasLibres} plazas libres`
             )}
           </span>
           <span className={styles.cardBadge}>
